@@ -1,2 +1,5 @@
-# twitter_elixir
-COP5615 Project 4
+# tapestry_elixir
+Twitter implementation in elixir
+
+# Run with
+mix run twitter.exs numNodes numRequests
