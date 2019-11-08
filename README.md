@@ -2,4 +2,4 @@
 Twitter implementation in elixir
 
 # Run with
-mix run twitter.exs numNodes numRequests
+mix run twitter.exs 
