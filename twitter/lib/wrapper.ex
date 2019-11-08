@@ -2,13 +2,19 @@ defmodule Wrapper do # wraps a centralized ETS instance
   use GenServer
 
   def init(arg) do
-    :ets.new(:wrapper, [
-      :set,
-      :public,
-      :named_table,
-      {:read_concurrency, true},
-      {:write_concurrency, true}
-    ])
+    :mnesia.create_schema([node()])
+    :mnesia.start
+    
+    {:ok,_} = :mnesia.create_table(hashtags, [attributes: [:hashtag, :tweets]]) # [#i_luv_twitter, {tweet object 1, tweet object 2, ...}]
+    {:ok,_} = :mnesia.create_table(mentions, [attributes: [:mention, :tweets]])
+    {:ok,_} = :mnesia.create_table(social_graph, [attributes: [:id, :followed_by]])
+    # :ets.new(:wrapper, [
+    #   :set,
+    #   :public,
+    #   :named_table,
+    #   {:read_concurrency, true},
+    #   {:write_concurrency, true}
+    # ])
 
     {:ok, arg}
   end
@@ -40,7 +46,8 @@ defmodule Wrapper do # wraps a centralized ETS instance
   end
 
   def handle_call({:put, key, value}, state) do
-    :ets.insert(:wrapper, {key, value})
+    :mnesia.write({User, 4, "Marge Simpson", "home maker"})
+    # :ets.insert(:wrapper, {key, value})
     -> :ok
   end
 end
