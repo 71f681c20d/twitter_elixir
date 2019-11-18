@@ -42,8 +42,11 @@ defmodule Engine do
     {:reply, :ok, state}
   end
 
-  def handle_cast({:receive_tweet, _tweet}, state) do
+  def handle_cast({:receive_tweet, tweet}, state) do
     # TODO Add tweet to tweet database, push to followers, mentions, and hashtags
+    push_to_followers(tweet)
+    {:ok, msg} = Map.fetch(tweet, :msg)
+    # TODO test regex on msg for hashtag and @
     {:noreply, state}
   end
 
@@ -52,4 +55,19 @@ defmodule Engine do
     {:noreply, state}
   end
 
+  def push_to_followers(tweet) do
+    # TODO get followers for Tweet.user, Add to followers timeline in db, If followers online push tweet
+    :ok
+  end
+
+  def push_to_hashtags(hashtag, tweet) do
+    # TODO add to hashtag db
+    :ok
+  end
+
+  def push_to_mentions(mentioned_user, tweet) do
+    # TODO add to mentions db
+    # If mentioned user online push straight to client
+    :ok
+  end
 end

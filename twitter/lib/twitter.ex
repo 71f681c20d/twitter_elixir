@@ -8,6 +8,7 @@ defmodule Twitter do
     MyDynamicSupervisor.start_engine()
     clients = MyDynamicSupervisor.start_clients(num_clients)# Returns list of users: user = %{uid, pid}
     Client.request_join_twitter(clients)
+
     #TODO Simulation.run
   end
 
