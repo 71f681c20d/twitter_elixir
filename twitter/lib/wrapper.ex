@@ -4,10 +4,17 @@ defmodule Wrapper do # wraps a centralized ETS instance
   def init(arg) do
     :mnesia.create_schema([node()])
     :mnesia.start
-    
-    {:ok,_} = :mnesia.create_table(hashtags, [attributes: [:hashtag, :tweets]]) # [#i_luv_twitter, {tweet object 1, tweet object 2, ...}]
-    {:ok,_} = :mnesia.create_table(mentions, [attributes: [:mention, :tweets]])
-    {:ok,_} = :mnesia.create_table(social_graph, [attributes: [:id, :followed_by]])
+    # A tweet object is like this: tweet = {user1, "mytweet #hello @user2", {#hello}, {@user2}}
+    {_, :ok} = :mnesia.create_table(hashtags, [ # [#i_luv_twitter, {tweet object 1, tweet object 2, ...}]
+                  attributes: [:hashtag, :tweets]
+                  type: :set])
+    {_, :ok} = :mnesia.create_table(mentions, [
+                  attributes: [:mention, :tweets]
+                  type: :set])
+    {_, :ok} = :mnesia.create_table(social_graph, [
+                  attributes: [:id, :followed_by]
+                  type: :set])
+
     # :ets.new(:wrapper, [
     #   :set,
     #   :public,
@@ -23,31 +30,28 @@ defmodule Wrapper do # wraps a centralized ETS instance
     GenServer.start_link(__MODULE__, arg, name: __MODULE__)
   end
 
-  def get(key) do
-    case :ets.lookup(:wrapper, key) do
-      [] ->
-        nil
-      [{_key, value}] ->
-        value
-    end
+  def get_hashtags(key), do: get(key, :hashtags)
+  def get_mentions(key), do: get(key, :mentions)
+  def get_social_graph(key), do: get(key, :social_graph)
+
+  def get(key, table) do
+    GenServer.cast(from_pid, {:get, key, table})
   end
 
-  def get(key, value) do
-    GenServer.cast(from_pid, {:get, key, value})   
+  def handle_cast({:get, key, table}, state) do
+    :mnesia.read({table, key})
   end
 
-  def handle_cast({:get, key, value}, state) do
-    :ets.insert(:wrapper, {key, value})
-  end
-  
-  def put(key, value) do
-    GenServer.call(from_pid, {:put, key, value})
-    -> :ok  
+  def put_hashtags(key, value), do: get(key, value, :hashtags)
+  def put_mentions(key, value), do: get(key, value, :mentions)
+  def put_social_graph(key, value), do: get(key, value, :social_graph)
+
+  def put(key, value, table) do
+    GenServer.call(from_pid, {:put, key, value, table})
   end
 
-  def handle_call({:put, key, value}, state) do
-    :mnesia.write({User, 4, "Marge Simpson", "home maker"})
-    # :ets.insert(:wrapper, {key, value})
+  def handle_call({:put, key, value, table}, state) do
+    :mnesia.write({table, key, value})
     -> :ok
   end
 end
