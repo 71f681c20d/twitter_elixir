@@ -35,6 +35,7 @@ defmodule Wrapper do # wraps a centralized ETS instance
   def get_social_graph(key), do: get(key, :social_graph)
 
   def get(key, table) do
+    from_pid = elem(Map.fetch(from, :pid), 1)
     GenServer.cast(from_pid, {:get, key, table})
   end
 
@@ -47,6 +48,7 @@ defmodule Wrapper do # wraps a centralized ETS instance
   def put_social_graph(key, value), do: get(key, value, :social_graph)
 
   def put(key, value, table) do
+    from_pid = elem(Map.fetch(from, :pid), 1)
     GenServer.call(from_pid, {:put, key, value, table})
   end
 
