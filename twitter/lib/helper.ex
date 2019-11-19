@@ -42,6 +42,7 @@ defmodule Helper do
     end
   end
 
+  # NOTE : Assumes only valid mentions
   def add_mentions([], _tweet) do :done end
   def add_mentions([hd | tl], tweet) do
     tweet_id = elem(Map.fetch(tweet, :tweet_id), 1)

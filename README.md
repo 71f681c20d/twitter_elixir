@@ -12,6 +12,5 @@ Make sure to delete Mnesia folder before running
 # TODO
 retweets
 hashtags
-mentions
 deliver live
 delete user
