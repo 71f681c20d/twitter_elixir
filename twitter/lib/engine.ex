@@ -50,8 +50,8 @@ defmodule Engine do
     state = Map.put(state, :tweet_id, current_tweet_id + 1)
     Wrapper.create_tweet(tweet)
     Helper.push_to_followers(tweet)
-    # TODO push to hashtag
-    # TODO push to mentions
+    #Helper.regex_hashtag(tweet)
+    #Helper.regex_mentions(tweet)
     {:noreply, state}
   end
 

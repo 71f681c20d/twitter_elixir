@@ -20,4 +20,26 @@ defmodule Helper do
     get_tweets_of_timeline(tl, tweets)
   end
 
+  def regex_hashtag(tweet) do
+    msg = elem(Map.fetch(tweet, :msg), 1)
+    case Regex.scan(~r/#[a-zA-z0-9]+/, msg) do
+      lst ->
+        lst = List.flatten(lst)
+        #TODO add to hashtags table
+      nil->
+        :no_match
+    end
+  end
+
+  def regex_mention(tweet) do
+    msg = elem(Map.fetch(tweet, :msg), 1)
+    case Regex.scan(~r/@[a-zA-z0-9]+/, msg) do
+      lst ->
+        lst = List.flatten(lst)
+        #TODO add to mentions table
+      nil->
+        :no_match
+    end
+  end
+
 end

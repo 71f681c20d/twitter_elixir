@@ -14,3 +14,4 @@ retweets
 hashtags
 mentions
 deliver live
+delete user
