@@ -29,7 +29,7 @@ defmodule Engine do
   end
 
   def handle_call({:query_timeline, user}, _from, state) do
-    [{Users, _uid, _pid, _followers, timeline}] = elem(Wrapper.get_user(elem(Map.fetch(user, :uid), 1)), 1)
+    [{Users, _uid, _pid, _followers, timeline, _mentions}] = elem(Wrapper.get_user(elem(Map.fetch(user, :uid), 1)), 1)
     tweets = Helper.get_tweets_of_timeline(timeline)
     {:reply, tweets, state}
   end
@@ -51,7 +51,7 @@ defmodule Engine do
     Wrapper.create_tweet(tweet)
     Helper.push_to_followers(tweet)
     #Helper.regex_hashtag(tweet)
-    #Helper.regex_mentions(tweet)
+    Helper.regex_mention(tweet)
     {:noreply, state}
   end
 
