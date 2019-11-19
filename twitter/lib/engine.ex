@@ -6,6 +6,7 @@ defmodule Engine do
   end
 
   def init(state) do
+    Wrapper.init()
     {:ok, state}
   end
 
@@ -21,9 +22,9 @@ defmodule Engine do
 
   def follow_user(user_origin, user_follow) do GenServer.cast(Engine, {:follow_request, user_origin, user_follow}) end
 
-  def handle_call({:join_twitter, _user}, _from, state) do
-    # TODO Add to list of all users - map with uid and pid
-    IO.puts 'Joined Twitter'
+  #Adds uid, pid and empty follower list to Users table
+  def handle_call({:join_twitter, user}, _from, state) do
+    Wrapper.create_user(user)
     {:reply, :ok, state}
   end
 
@@ -47,11 +48,16 @@ defmodule Engine do
     # TODO Add tweet to tweet database, push to followers, mentions, and hashtags
     IO.puts 'received tweet'
     IO.inspect(tweet)
+    tweeter_id = elem(Map.fetch(tweet, :uid), 1)
+    tweeter = Wrapper.get_user(tweeter_id)
+    IO.inspect(tweeter)
     {:noreply, state}
   end
 
-  def handle_cast({:follow_request, _user_origin, _user_follow}, state) do
-    # TODO add user_origin to user_follows list of followers
+  # Updates user_follow in Users tables, add user_origin uid to followers
+  def handle_cast({:follow_request, user_origin, user_follow}, state) do
+    uid_origin = elem(Map.fetch(user_origin, :uid), 1)
+    Wrapper.add_follower(uid_origin, user_follow)
     {:noreply, state}
   end
 
