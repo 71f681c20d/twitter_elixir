@@ -2,7 +2,7 @@ defmodule Engine do
   use GenServer
 
   def start_link() do
-    GenServer.start_link(__MODULE__, %{}, name: Engine)
+    GenServer.start_link(__MODULE__, %{tweet_id: 1000}, name: Engine)
   end
 
   def init(state) do
@@ -45,12 +45,13 @@ defmodule Engine do
   end
 
   def handle_cast({:receive_tweet, tweet}, state) do
-    # TODO Add tweet to tweet database, push to followers, mentions, and hashtags
-    IO.puts 'received tweet'
-    IO.inspect(tweet)
-    tweeter_id = elem(Map.fetch(tweet, :uid), 1)
-    tweeter = Wrapper.get_user(tweeter_id)
-    IO.inspect(tweeter)
+    current_tweet_id = elem(Map.fetch(state, :tweet_id), 1)
+    tweet = Map.put(tweet, :tweet_id, current_tweet_id)
+    state = Map.put(state, :tweet_id, current_tweet_id + 1)
+    Wrapper.create_tweet(tweet)
+    push_to_followers(tweet)
+    # TODO push to hashtag
+    # TODO push to mentions
     {:noreply, state}
   end
 
@@ -61,4 +62,15 @@ defmodule Engine do
     {:noreply, state}
   end
 
+  #Add tweet to all of the tweeters followers timelines
+  def push_to_followers(tweet) do
+    tweet_id = elem(Map.fetch(tweet, :tweet_id), 1)
+    [{Users, _uid, _pid, followers, _timeline}] = elem(Wrapper.get_user(elem(Map.fetch(tweet, :uid), 1)), 1)
+    push_to_followers(followers, tweet_id)
+  end
+  def push_to_followers([], _tweet_id) do :done end
+  def push_to_followers([hd | tl], tweet_id) do
+    Wrapper.add_timeline(hd, tweet_id)
+    push(tl, tweet_id)
+  end
 end

@@ -8,15 +8,20 @@ defmodule Twitter do
     MyDynamicSupervisor.start_engine()
     clients = MyDynamicSupervisor.start_clients(num_clients)# Returns list of users: user = %{uid, pid}
     Client.request_join_twitter(clients)
-    #Simulation.build_social_graph(clients)
-    #Simulation.run(clients, num_messages)
 
+
+
+    #Simulation.build_social_graph(clients)
     [a | _tl] = clients
     Client.request_follow_user(a, "2")
     loop(1000000)
-    IO.puts '---'
+    Simulation.run(clients, num_messages)
+    loop(1000000)
+    IO.inspect(Wrapper.get_user("1"))
     IO.inspect(Wrapper.get_user("2"))
-    IO.puts '---'
+    #IO.puts '---'
+    #IO.inspect(Wrapper.get_user("2"))
+    #IO.puts '---'
   end
 
   def loop(0) do :done end
