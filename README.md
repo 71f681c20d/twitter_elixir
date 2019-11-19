@@ -8,3 +8,9 @@ mix run twitter.exs <- change to eventually
 
 # Notes
 Make sure to delete Mnesia folder before running
+
+# TODO
+retweets
+hashtags
+mentions
+deliver live

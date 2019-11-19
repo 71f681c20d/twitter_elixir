@@ -17,8 +17,9 @@ defmodule Twitter do
     loop(1000000)
     Simulation.run(clients, num_messages)
     loop(1000000)
-    IO.inspect(Wrapper.get_user("1"))
+    IO.inspect(Wrapper.get_user("1")) #a
     IO.inspect(Wrapper.get_user("2"))
+    IO.inspect(Client.request_query_timeline(a))
     #IO.puts '---'
     #IO.inspect(Wrapper.get_user("2"))
     #IO.puts '---'

@@ -28,10 +28,10 @@ defmodule Engine do
     {:reply, :ok, state}
   end
 
-  def handle_call({:query_timeline, _user}, _from, state) do
-    # TODO get timeline for uid in user
-    # dbms_pid = elem(Map.fetch(from, :pid), 1)
-    {:reply, :ok, state}
+  def handle_call({:query_timeline, user}, _from, state) do
+    [{Users, _uid, _pid, _followers, timeline}] = elem(Wrapper.get_user(elem(Map.fetch(user, :uid), 1)), 1)
+    tweets = Helper.get_tweets_of_timeline(timeline)
+    {:reply, tweets, state}
   end
 
   def handle_call({:query_mentions, _user}, _from, state) do
@@ -49,7 +49,7 @@ defmodule Engine do
     tweet = Map.put(tweet, :tweet_id, current_tweet_id)
     state = Map.put(state, :tweet_id, current_tweet_id + 1)
     Wrapper.create_tweet(tweet)
-    push_to_followers(tweet)
+    Helper.push_to_followers(tweet)
     # TODO push to hashtag
     # TODO push to mentions
     {:noreply, state}
@@ -60,17 +60,5 @@ defmodule Engine do
     uid_origin = elem(Map.fetch(user_origin, :uid), 1)
     Wrapper.add_follower(uid_origin, user_follow)
     {:noreply, state}
-  end
-
-  #Add tweet to all of the tweeters followers timelines
-  def push_to_followers(tweet) do
-    tweet_id = elem(Map.fetch(tweet, :tweet_id), 1)
-    [{Users, _uid, _pid, followers, _timeline}] = elem(Wrapper.get_user(elem(Map.fetch(tweet, :uid), 1)), 1)
-    push_to_followers(followers, tweet_id)
-  end
-  def push_to_followers([], _tweet_id) do :done end
-  def push_to_followers([hd | tl], tweet_id) do
-    Wrapper.add_timeline(hd, tweet_id)
-    push(tl, tweet_id)
   end
 end
