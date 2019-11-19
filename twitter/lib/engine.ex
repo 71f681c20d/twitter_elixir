@@ -23,7 +23,7 @@ defmodule Engine do
 
   def handle_call({:join_twitter, _user}, _from, state) do
     # TODO Add to list of all users - map with uid and pid
-    IO.puts 'called'
+    IO.puts 'Joined Twitter'
     {:reply, :ok, state}
   end
 
@@ -43,8 +43,10 @@ defmodule Engine do
     {:reply, :ok, state}
   end
 
-  def handle_cast({:receive_tweet, _tweet}, state) do
+  def handle_cast({:receive_tweet, tweet}, state) do
     # TODO Add tweet to tweet database, push to followers, mentions, and hashtags
+    IO.puts 'received tweet'
+    IO.inspect(tweet)
     {:noreply, state}
   end
 
