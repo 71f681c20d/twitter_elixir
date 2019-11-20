@@ -34,17 +34,17 @@ defmodule Engine do
     {:reply, tweets, state}
   end
 
-  def handle_call({:query_mentions, _user}, _from, state) do
+  def handle_call({:query_mentions, user}, _from, state) do
     # TODO get mentions of timeline from uid of user
-    {:ok, value} = process_event(kind, params)
-    Wrapper.update_score(id, value)
+    # {:ok, value} = process_event(kind, params)
+    Wrapper.query_mention(user)
     {:reply, :ok, state}
   end
 
   def handle_call({:query_hashtag, hashtag}, _from, state) do
     # TODO get tweet list with hastag uid
     # {:ok, value} = process_event(kind, params)
-    Wrapper.get_hashtag(hashtag)
+    Wrapper.query_hashtag(hashtag)
     {:reply, :ok, state}
   end
 

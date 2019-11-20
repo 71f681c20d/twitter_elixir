@@ -55,6 +55,7 @@ defmodule Wrapper do # wraps a centralized ETS instance
 
   # Manipulate Hashtag table
 
-  def get_hashtag(hashtag), do: :mnesia.transaction( fn -> :mnesia.match_object({Hashtags, hashtag, :_, :_, :_, :_})
-
+  def query_hashtag(hashtag), do: :mnesia.transaction( fn -> :mnesia.match_object({Hashtags, hashtag, :_}) # returns all tweets containing the hashtag
+  def query_mention(hashtag), do: :mnesia.transaction( fn -> :mnesia.match_object({Hashtags, hashtag, :_})
+  def query_mention(user), do: :mnesia.transaction( fn -> :mnesia.match_object({Users, :_, :_, :_, :_, user}) end)
 end
