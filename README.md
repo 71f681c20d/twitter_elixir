@@ -12,4 +12,3 @@ Make sure to delete Mnesia folder before running
 # TODO
 retweets
 hashtags
-deliver live

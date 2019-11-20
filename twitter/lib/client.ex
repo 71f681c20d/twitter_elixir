@@ -45,6 +45,10 @@ defmodule Client do
     GenServer.cast(pid, {:request_follow_user, user_origin, user_follow})
   end
 
+  def receive_live_tweet(pid, tweet) do
+    GenServer.cast(pid, {:live_tweet, tweet})
+  end
+
   def request_make_tweet(user, tweet) do
     pid = elem(Map.fetch(user, :pid), 1)
     GenServer.cast(pid, {:request_make_tweet, tweet})
@@ -83,6 +87,11 @@ defmodule Client do
 
   def handle_cast({:request_make_tweet, tweet}, state) do
     Engine.receive_tweet(tweet)
+    {:noreply, state}
+  end
+
+  def handle_cast({:live_tweet, _tweet}, state) do
+    # Receives tweet on client
     {:noreply, state}
   end
 

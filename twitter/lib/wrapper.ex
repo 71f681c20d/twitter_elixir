@@ -55,6 +55,7 @@ defmodule Wrapper do # wraps a centralized ETS instance
     :mnesia.transaction( fn -> :mnesia.delete({Users, uid, :_, :_, :_, :_}) end)
     timeline = [tweet_id | timeline]
     :mnesia.transaction( fn -> :mnesia.write({Users, uid, pid, followers, timeline, mentions}) end)
+    Helper.push_live(pid, tweet_id)
   end
 
   def add_mention(uid, tweet_id) do
@@ -62,6 +63,7 @@ defmodule Wrapper do # wraps a centralized ETS instance
     :mnesia.transaction( fn -> :mnesia.delete({Users, uid, :_, :_, :_, :_}) end)
     mentions = [tweet_id | mentions]
     :mnesia.transaction( fn -> :mnesia.write({Users, uid, pid, followers, timeline, mentions}) end)
+    Helper.push_live(pid, tweet_id)
   end
 
   def get_user(uid) do :mnesia.transaction( fn -> :mnesia.match_object({Users, uid, :_, :_, :_, :_}) end) end

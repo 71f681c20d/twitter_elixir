@@ -59,4 +59,13 @@ defmodule Helper do
     add_hashtags(tl, tweet_id)
   end
 
+  def push_live(pid, tweet_id) do
+    case pid do
+      nil -> :done
+      _ ->
+        tweet = Wrapper.get_tweet(tweet_id)
+        Client.receive_live_tweet(pid, tweet)
+    end
+  end
+
 end

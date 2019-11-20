@@ -17,14 +17,14 @@ defmodule Twitter do
     #loop(1000000)
     #Simulation.run(clients, num_messages)
     #loop(1000000)
-    #tweeta = %{uid: "1", msg: "Hello #Hello"}
-    #tweetb = %{uid: "1", msg: "Hello2 #Hello"}
-    #Client.request_make_tweet(a, tweeta)
-    #Client.request_make_tweet(a, tweetb)
-    loop(1000000000)
+    tweeta = %{uid: "2", msg: "Hello #Hello"}
+    tweetb = %{uid: "2", msg: "Hello2 #Hello"}
+    Client.request_make_tweet(a, tweeta)
+    Client.request_make_tweet(a, tweetb)
+    #loop(100000000)
     #IO.inspect(Wrapper.query_hashtag("#Hello"))
-    IO.inspect(Wrapper.get_user("1")) #a
-    IO.inspect(Wrapper.get_user("2"))
+    #IO.inspect(Wrapper.get_user("1")) #a
+    #IO.inspect(Wrapper.get_user("2"))
     #IO.inspect(Client.request_query_timeline(a))
     #IO.puts '---'
     #IO.inspect(Wrapper.get_user("2"))
