@@ -20,6 +20,11 @@ defmodule Client do
     GenServer.call(pid, {:request_join_twitter, user})
   end
 
+  def request_delete_user(user) do
+    pid = elem(Map.fetch(user, :pid), 1)
+    GenServer.call(pid, {:request_delete_twitter, user})
+  end
+
   def request_query_timeline(user) do
     pid = elem(Map.fetch(user, :pid), 1)
     GenServer.call(pid, {:request_query_timeline, user})
@@ -49,6 +54,11 @@ defmodule Client do
   def handle_call({:request_join_twitter, user}, _from, state) do
     rep = Engine.join_twitter(user)
     {:reply, rep, state}
+  end
+
+  def handle_call({:request_delete_twitter, user}, _from, state) do
+    Engine.delete_twitter(user)
+    {:reply, :ok, state}
   end
 
   def handle_call({:request_query_timeline, user}, _from, state) do

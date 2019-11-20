@@ -13,4 +13,3 @@ Make sure to delete Mnesia folder before running
 retweets
 hashtags
 deliver live
-delete user

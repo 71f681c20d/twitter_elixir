@@ -12,6 +12,8 @@ defmodule Engine do
 
   def join_twitter(user) do GenServer.call(Engine, {:join_twitter, user}) end
 
+  def delete_twitter(user) do GenServer.call(Engine, {:delete_twitter, user}) end
+
   def query_timeline(user) do GenServer.call(Engine, {:query_timeline, user}) end
 
   def query_mentions(user) do GenServer.call(Engine, {:query_mentions, user}) end
@@ -28,23 +30,25 @@ defmodule Engine do
     {:reply, :ok, state}
   end
 
+  def handle_call({:delete_twitter, user}, _from, state) do
+    Wrapper.delete_user(user)
+    {:reply, :ok, state}
+  end
+
   def handle_call({:query_timeline, user}, _from, state) do
     [{Users, _uid, _pid, _followers, timeline, _mentions}] = elem(Wrapper.get_user(elem(Map.fetch(user, :uid), 1)), 1)
-    tweets = Helper.get_tweets_of_timeline(timeline)
+    tweets = Helper.get_tweets_of_list(timeline)
     {:reply, tweets, state}
   end
 
   def handle_call({:query_mentions, user}, _from, state) do
-    # TODO get mentions of timeline from uid of user
-    # {:ok, value} = process_event(kind, params)
-    Wrapper.query_mention(user)
-    {:reply, :ok, state}
+    [{Users, _uid, _pid, _followers, _timeline, mentions}] = elem(Wrapper.get_user(elem(Map.fetch(user, :uid), 1)), 1)
+    tweets = Helper.get_tweets_of_list(mentions)
+    {:reply, tweets, state}
   end
 
-  def handle_call({:query_hashtag, hashtag}, _from, state) do
+  def handle_call({:query_hashtag, _hashtag}, _from, state) do
     # TODO get tweet list with hastag uid
-    # {:ok, value} = process_event(kind, params)
-    Wrapper.query_hashtag(hashtag)
     {:reply, :ok, state}
   end
 
@@ -54,7 +58,7 @@ defmodule Engine do
     state = Map.put(state, :tweet_id, current_tweet_id + 1)
     Wrapper.create_tweet(tweet)
     Helper.push_to_followers(tweet)
-    #Helper.regex_hashtag(tweet)
+    Helper.regex_hashtag(tweet)
     Helper.regex_mention(tweet)
     {:noreply, state}
   end
