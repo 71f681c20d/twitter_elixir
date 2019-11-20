@@ -49,9 +49,10 @@ defmodule Engine do
     {:reply, tweets, state}
   end
 
-  def handle_call({:query_hashtag, _hashtag}, _from, state) do
-    # TODO get tweet list with hastag uid
-    {:reply, :ok, state}
+  def handle_call({:query_hashtag, hashtag}, _from, state) do
+    [{Hashtags, _hashtag, hashtag_tweet_ids}] = elem(Wrapper.query_hashtag(hashtag), 1)
+    tweets = Helper.get_tweets_of_list(hashtag_tweet_ids)
+    {:reply, tweets, state}
   end
 
   def handle_cast({:receive_tweet, tweet}, state) do

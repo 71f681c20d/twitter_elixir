@@ -37,7 +37,7 @@ defmodule Client do
 
   def request_query_hashtag(user, hashtag) do
     pid = elem(Map.fetch(user, :pid), 1)
-    GenServer.call(pid, {:request_query_mentions, hashtag})
+    GenServer.call(pid, {:request_query_hashtag, hashtag})
   end
 
   def request_follow_user(user_origin, user_follow) do
@@ -96,9 +96,8 @@ defmodule Client do
     {:noreply, state}
   end
 
-  def handle_cast({:live_tweet, tweet}, state) do
+  def handle_cast({:live_tweet, _tweet}, state) do
     # Receives tweet on client from engine
-    IO.inspect(tweet)
     {:noreply, state}
   end
 

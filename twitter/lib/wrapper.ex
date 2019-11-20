@@ -21,10 +21,8 @@ defmodule Wrapper do # wraps a centralized ETS instance
       [{Users, uid, pid, followers, timeline, mentions}] ->
         case pid do
           nil ->
-            :mnesia.transaction( fn ->
-              :mnesia.delete({Users, uid, :_, :_, :_, :_})
-              :mnesia.write({Users, uid, pid, followers, timeline, mentions})
-            end)
+            :mnesia.transaction( fn -> :mnesia.delete({Users, uid, :_, :_, :_, :_}) end)
+            :mnesia.transaction( fn ->  :mnesia.write({Users, uid, pid, followers, timeline, mentions}) end)
           _ ->
             :error_user_already_exist
         end
@@ -37,10 +35,8 @@ defmodule Wrapper do # wraps a centralized ETS instance
   def delete_user(user) do
     uid = elem(Map.fetch(user, :uid), 1)
     [{Users, uid, _pid, followers, timeline, mentions}] = elem(get_user(uid), 1)
-    :mnesia.transaction( fn ->
-      :mnesia.delete({Users, uid, :_, :_, :_, :_})
-      :mnesia.write({Users, uid, nil, followers, timeline, mentions})
-    end)
+    :mnesia.transaction( fn -> :mnesia.delete({Users, uid, :_, :_, :_, :_}) end)
+    :mnesia.transaction( fn -> :mnesia.write({Users, uid, nil, followers, timeline, mentions}) end)
   end
 
   def add_follower(uid_origin, uid_follows) do
@@ -83,16 +79,12 @@ defmodule Wrapper do # wraps a centralized ETS instance
     obj = elem(:mnesia.transaction(fn -> :mnesia.match_object({Hashtags, hashtag, :_}) end), 1) # Check if hashtag already exist
     case obj do
       [] ->
-        IO.puts 'THERE'
         :mnesia.transaction(fn -> :mnesia.write({Hashtags, hashtag, [tweet_id]}) end)
       [hd] ->
-        IO.puts 'ABC'
         {Hashtags, _hashtag, tweet_id_list} = hd
         tweet_id_list = [tweet_id | tweet_id_list]
-        :mnesia.transaction(fn ->
-          :mnesia.delete({Hashtags, hashtag, :_})
-          :mnesia.write({Hashtags, hashtag, tweet_id_list})
-        end)
+        :mnesia.transaction(fn -> :mnesia.delete({Hashtags, hashtag, :_}) end)
+        :mnesia.transaction(fn -> :mnesia.write({Hashtags, hashtag, tweet_id_list}) end)
       _ ->
         :Error # Somehow multiple entries for same hashtag
     end
@@ -100,6 +92,4 @@ defmodule Wrapper do # wraps a centralized ETS instance
 
   def query_hashtag(hashtag) do :mnesia.transaction(fn -> :mnesia.match_object({Hashtags, hashtag, :_}) end) end
 
-  #def query_hashtag(hashtag), do: :mnesia.transaction( fn -> :mnesia.match_object({Hashtags, hashtag, :_}) # returns all tweets containing the hashtagdef query_mention(hashtag), do: :mnesia.transaction( fn -> :mnesia.match_object({Hashtags, hashtag, :_})
-  #def query_mention(user), do: :mnesia.transaction( fn -> :mnesia.match_object({Users, :_, :_, :_, :_, user}) end)
 end
