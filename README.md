@@ -10,4 +10,6 @@ mix run twitter.exs <- change to eventually
 Make sure to delete Mnesia folder before running
 
 # TODO
-hashtags
+test
+follower distribution
+start
