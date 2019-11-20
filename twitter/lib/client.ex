@@ -54,6 +54,12 @@ defmodule Client do
     GenServer.cast(pid, {:request_make_tweet, tweet})
   end
 
+  def request_retweet(user, tweet_id) do
+    pid = elem(Map.fetch(user, :pid), 1)
+    uid = elem(Map.fetch(user, :uid), 1)
+    GenServer.cast(pid, {:request_retweet, uid, tweet_id})
+  end
+
   # These forward on the request to the Engine
   def handle_call({:request_join_twitter, user}, _from, state) do
     rep = Engine.join_twitter(user)
@@ -90,8 +96,14 @@ defmodule Client do
     {:noreply, state}
   end
 
-  def handle_cast({:live_tweet, _tweet}, state) do
-    # Receives tweet on client
+  def handle_cast({:live_tweet, tweet}, state) do
+    # Receives tweet on client from engine
+    IO.inspect(tweet)
+    {:noreply, state}
+  end
+
+  def handle_cast({:request_retweet, uid, tweet_id}, state) do
+    Engine.retweet(uid, tweet_id)
     {:noreply, state}
   end
 

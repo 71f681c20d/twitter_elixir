@@ -12,6 +12,11 @@ defmodule Helper do
     push_to_followers(tl, tweet_id)
   end
 
+  def push_retweet(uid, tweet_id) do
+    [{Users, _uid, _pid, followers, _timeline, _mentions}] = elem(Wrapper.get_user(uid), 1)
+    push_to_followers(followers, tweet_id)
+  end
+
   # Get list of tweets corresponding to list of tweet_ids
   def get_tweets_of_list(timeline) do get_tweets_of_list(timeline, []) end
   def get_tweets_of_list([], tweets) do tweets end
