@@ -5,6 +5,7 @@ defmodule Wrapper do # wraps a centralized ETS instance
     :mnesia.start
     # A tweet object is like this: tweet = {user1, "mytweet #hello @user2", {#hello}, {@user2}}
     {_, :ok} = :mnesia.create_table(Hashtags, [  attributes: [:hashtag, :tweets], type: :set]) # [#i_luv_twitter, {tweet object 1, tweet object 2, ...}]
+    # {_, :ok} = :mnesia.create_table(Mentions, [  attributes: [:hashtag, :tweets], type: :set]) # [#i_luv_twitter, {tweet object 1, tweet object 2, ...}]
     {_, :ok} = :mnesia.create_table(Tweets, [ attributes: [:tweet_id, :uid, :msg], type: :set])
     {_, :ok} = :mnesia.create_table(Users, [ attributes: [:uid, :pid, :followers, :timeline, :mentions], type: :set])
     :ok
@@ -54,6 +55,6 @@ defmodule Wrapper do # wraps a centralized ETS instance
 
   # Manipulate Hashtag table
 
-
+  def get_hashtag(hashtag), do: :mnesia.transaction( fn -> :mnesia.match_object({Hashtags, hashtag, :_, :_, :_, :_})
 
 end
