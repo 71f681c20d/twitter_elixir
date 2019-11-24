@@ -26,6 +26,7 @@ defmodule Engine do
 
   def retweet(uid, tweet_id) do GenServer.cast(Engine, {:retweet, uid, tweet_id}) end
 
+
   #Adds uid, pid and empty follower list to Users table
   def handle_call({:join_twitter, user}, _from, state) do
     Wrapper.create_user(user)
@@ -63,18 +64,18 @@ defmodule Engine do
     Helper.push_to_followers(tweet)
     Helper.regex_hashtag(tweet)
     Helper.regex_mention(tweet)
-    {:noreply, state}
+    {:reply, :ok, state}
   end
 
   # Updates user_follow in Users tables, add user_origin uid to followers
   def handle_cast({:follow_request, user_origin, user_follow}, state) do
     uid_origin = elem(Map.fetch(user_origin, :uid), 1)
     Wrapper.add_follower(uid_origin, user_follow)
-    {:noreply, state}
+    {:reply, :ok, state}
   end
 
   def handle_cast({:retweet, uid, tweet_id}, state) do
     Helper.push_retweet(uid, tweet_id)
-    {:noreply, state}
+    {:reply, :ok, state}
   end
 end
