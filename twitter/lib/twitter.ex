@@ -13,6 +13,7 @@ defmodule Twitter do
     Simulation.run(clients, num_messages)
 
     #[a, b | _c] = clients
+    #loop(10000000) # otherwise query will timeout
     #IO.inspect(Client.request_query_timeline(a))
     #IO.inspect(Client.request_query_timeline(b))
     #IO.inspect(Client.request_query_hashtag(a, "#Hashtag1"))
