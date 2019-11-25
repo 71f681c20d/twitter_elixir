@@ -64,18 +64,18 @@ defmodule Engine do
     Helper.push_to_followers(tweet)
     Helper.regex_hashtag(tweet)
     Helper.regex_mention(tweet)
-    {:reply, :ok, state}
+    {:noreply, state}
   end
 
   # Updates user_follow in Users tables, add user_origin uid to followers
   def handle_cast({:follow_request, user_origin, user_follow}, state) do
     uid_origin = elem(Map.fetch(user_origin, :uid), 1)
     Wrapper.add_follower(uid_origin, user_follow)
-    {:reply, :ok, state}
+    {:noreply, state}
   end
 
   def handle_cast({:retweet, uid, tweet_id}, state) do
     Helper.push_retweet(uid, tweet_id)
-    {:reply, :ok, state}
+    {:noreply, state}
   end
 end
