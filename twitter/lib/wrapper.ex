@@ -18,11 +18,13 @@ defmodule Wrapper do # wraps a centralized ETS instance
     case user do
       [] ->
         :mnesia.transaction( fn -> :mnesia.write({Users, uid, pid, [], [], []}) end)
+        :created
       [{Users, uid, pid, followers, timeline, mentions}] ->
         case pid do
           nil ->
             :mnesia.transaction( fn -> :mnesia.delete({Users, uid, :_, :_, :_, :_}) end)
             :mnesia.transaction( fn ->  :mnesia.write({Users, uid, pid, followers, timeline, mentions}) end)
+            :signed_in
           _ ->
             :error_user_already_exist
         end
@@ -40,10 +42,11 @@ defmodule Wrapper do # wraps a centralized ETS instance
   end
 
   def add_follower(uid_origin, uid_follows) do
-    [{Users, uid, pid, followers, timeline, mentions}] = elem(:mnesia.transaction( fn -> :mnesia.match_object({Users, uid_follows, :_, :_, :_, :_}) end), 1)
-    :mnesia.transaction( fn -> :mnesia.delete({Users, uid, :_, :_, :_, :_}) end)
-    followers = [uid_origin | followers]
-    :mnesia.transaction( fn -> :mnesia.write({Users, uid, pid, followers, timeline, mentions}) end)
+    IO.inspect(:mnesia.transaction( fn -> :mnesia.match_object({Users, uid_follows, :_, :_, :_, :_}) end))
+    #[{Users, uid, pid, followers, timeline, mentions}] = elem(:mnesia.transaction( fn -> :mnesia.match_object({Users, uid_follows, :_, :_, :_, :_}) end), 1)
+    #:mnesia.transaction( fn -> :mnesia.delete({Users, uid, :_, :_, :_, :_}) end)
+    #followers = [uid_origin | followers]
+    #:mnesia.transaction( fn -> :mnesia.write({Users, uid, pid, followers, timeline, mentions}) end)
   end
 
   def add_timeline(uid, tweet_id) do

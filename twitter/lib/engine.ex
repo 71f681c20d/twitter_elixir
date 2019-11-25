@@ -28,8 +28,8 @@ defmodule Engine do
 
   #Adds uid, pid and empty follower list to Users table
   def handle_call({:join_twitter, user}, _from, state) do
-    Wrapper.create_user(user)
-    {:reply, :ok, state}
+    res = Wrapper.create_user(user)
+    {:reply, res, state}
   end
 
   def handle_call({:delete_twitter, user}, _from, state) do

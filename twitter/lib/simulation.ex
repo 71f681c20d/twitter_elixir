@@ -1,19 +1,53 @@
 defmodule Simulation do
 
-  #Do full network temporarily
-  #def build_social_graph(clients) do build_social_graph(clients, clients) end
-  #def build_social_graph([], _clients) do :done end
-  #def build_social_graph([hd | tl], clients) do
-  #  follow_others(hd, clients -- [hd])
-  #  build_social_graph(tl, clients)
-  #end
+  # Build out followers for each user.
+  # Build celebrity users with lots of followers
 
-  #def follow_others(_hd, []) do :done end
-  #def follow_others(hd, [frst | others]) do
-  #  frst_uid = elem(Map.fetch(frst, :uid), 1)
-  #  Client.request_follow_user(hd, frst_uid)
-  #  follow_others(hd, [others])
-  #end
+  # If user marked celebrity higher chance to follow them
+  # If user follows you higher chance to follow them
+  def build_social_graph(clients) do build_social_graph(clients, clients) end
+  def build_social_graph([], _clients) do :done end
+  def build_social_graph([hd | tl], clients) do
+    clients = create_celebrities(clients)
+    follow_users(hd, clients)
+    build_social_graph(tl, clients)
+  end
+
+  def create_celebrities(list) do create_celebrities(list, []) end
+  def create_celebrities([], list) do list end
+  def create_celebrities([hd | tl], done) do
+    num = :rand.uniform(99)
+    cond do
+      num > 93 ->
+        hd = Map.put(hd, :celeb, :true)
+        create_celebrities(tl, [hd | done])
+      true ->
+        hd = Map.put(hd, :celeb, :false)
+        create_celebrities(tl, [hd | done])
+    end
+  end
+
+  def follow_users(_follower, []) do :done end
+  def follow_users(follower, [hd | tl]) do
+    celeb = elem(Map.fetch(hd, :celeb), 1)
+    case celeb do
+      :true ->
+        do_follow(follower, 40, hd)
+      :false ->
+        do_follow(follower, 90, hd)
+    end
+    follow_users(follower, tl)
+  end
+
+  def do_follow(follower, chance, user) do
+    num = :rand.uniform(100)
+    cond do
+      num > chance ->
+        Client.request_follow_user(follower, user)
+      true ->
+        :done
+    end
+  end
 
   #Run send_msg num_msg times for each client in list
   def run(clients, num_msgs) do run(clients, num_msgs, clients) end
