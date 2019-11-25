@@ -1,15 +1,12 @@
-# tapestry_elixir
+# Twitter Project
 Twitter implementation in elixir
 
-# Run with
-iex -S mix for testing
+# Authors
+Lee Deffebach 6448 5421
+Alex Banard
 
-mix run twitter.exs <- change to eventually
+# Run with
+mix run twitter.exs num_clients num_messgaes
 
 # Notes
-Make sure to delete Mnesia folder before running
-
-# TODO
-test
-follower distribution
-start
+Make sure to delete Mnesia folder before running. Not doing this will cause program to crash
