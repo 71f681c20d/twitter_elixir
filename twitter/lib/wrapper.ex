@@ -18,11 +18,14 @@ defmodule Wrapper do # wraps a centralized ETS instance
     case user do
       [] ->
         :mnesia.transaction( fn -> :mnesia.write({Users, uid, pid, [], [], []}) end)
+        :mnesia.transaction( fn -> :mnesia.match_object({Users, uid, :_, :_, :_, :_}) end)
+        :created
       [{Users, uid, pid, followers, timeline, mentions}] ->
         case pid do
           nil ->
             :mnesia.transaction( fn -> :mnesia.delete({Users, uid, :_, :_, :_, :_}) end)
             :mnesia.transaction( fn ->  :mnesia.write({Users, uid, pid, followers, timeline, mentions}) end)
+            :signed_in
           _ ->
             :error_user_already_exist
         end
@@ -39,7 +42,8 @@ defmodule Wrapper do # wraps a centralized ETS instance
     :mnesia.transaction( fn -> :mnesia.write({Users, uid, nil, followers, timeline, mentions}) end)
   end
 
-  def add_follower(uid_origin, uid_follows) do
+  def add_follower(uid_origin, follows) do
+    uid_follows = elem(Map.fetch(follows, :uid), 1)
     [{Users, uid, pid, followers, timeline, mentions}] = elem(:mnesia.transaction( fn -> :mnesia.match_object({Users, uid_follows, :_, :_, :_, :_}) end), 1)
     :mnesia.transaction( fn -> :mnesia.delete({Users, uid, :_, :_, :_, :_}) end)
     followers = [uid_origin | followers]
