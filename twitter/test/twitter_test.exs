@@ -15,56 +15,66 @@ defmodule TwitterTest do
       Mention
     Deliver twwets live if the user is connected
   """
-  # setup_all do
-  #   for i <- [1..10], do: Engine.join_twitter("myusername"+Integer.to_string(i))
-  #   for i <- [1..10] do # everyone follows 3 random ppl
-  #     Engine.follow_user("myusername"+Integer.to_string(i), :rand.uniform(10))
-  #     Engine.follow_user("myusername"+Integer.to_string(i), :rand.uniform(10))
-  #     Engine.follow_user("myusername"+Integer.to_string(i), :rand.uniform(10))
-  #   end
-  #   for i <- [1..9], do: Engine.receive_tweet("mentioning @username"+Integer.to_string(:rand.uniform(10))+"and twweting about #hashtag"+Integer.to_string(:rand.uniform(10)))
-  #   {:ok}
-  # end
+
+  setup_all do
+    MyDynamicSupervisor.start_link()
+    Engine.start_link()
+    Wrapper.init()
+    lst = MyDynamicSupervisor.start_clients(2);
+    [a, b] = lst
+    Client.request_join_twitter(a)
+    Client.request_join_twitter(b)
+    {:ok, clients: lst}
+  end
 
   test "register new account" do
-    assert {_reply, :ok, _state} = Engine.join_twitter("myusername")
+    user = %{pid: 'somepid', uid: 'myusername'}
+    status = Engine.join_twitter(user)
+    assert status == :created
   end
 
   test "Delete account" do
-    assert {_reply, :ok, _state} = Engine.join_twitter("myusername")
+    user = %{pid: 'somepid', uid: 'myusername2'}
+    Engine.join_twitter(user)
+    Engine.delete_twitter(user)
+    [{Users, _uid, pid, _followers, _timeline, _mentions}] = elem(Wrapper.get_user('myusername2'), 1)
+    assert nil == pid
   end
 
-  test "Send a tweet" do
-    # send a tweet with hashtags and mentions
-    assert {_reply, :ok, _state} = Engine.receive_tweet("OMG #ThaBadApple is nuts. Check it @myusername1 #gottaseethis !!")
+  test "Follow user", state do
+    [a, b | _tl] = state[:clients]
+    Client.request_follow_user(a, b)
+    Twitter.loop(1000000) #Give time for cast to finish
+    [{Users, _uid, _pid, followers, _timeline, _mentions}] = elem(Wrapper.get_user(elem(Map.fetch(b, :uid), 1)), 1)
+    assert followers == ["1"]
   end
 
-  test "Subscribe to a user's tweets" do
-    assert {_reply, :ok, _state} = Engine.follow_user("myusername1", "myusername2")
+  test "Receive tweet from following", state do
+    [a, b | _tl] = state[:clients]
+    Client.request_follow_user(b, a)
+    tweet = %{uid: "1", msg: "Hello World"}
+    Client.request_make_tweet(a, tweet)
+    Twitter.loop(1000000) #Give time for cast to finish
+    [atomic: [{Tweets, _tweet_id, _uid, msg}]] = Client.request_query_timeline(b)
+    # Do this because tweet_id might change based on order of tests
+    assert msg == "Hello World"
+  end
+ 
+  test "Hashtags", state do
+    [a | _tl] = state[:clients]
+    tweet = %{uid: "2", msg: "Hello Tester #TESTING"}
+    Client.request_make_tweet(a, tweet)
+    [atomic: [{Tweets, _tweet_id, _uid, msg}]] = Client.request_query_hashtag(a, "#TESTING")
+    # Do this because tweet_id might change based on order of tests
+    assert msg == "Hello Tester #TESTING"
   end
 
-  test "Re-tweet" do
-    assert false
-    # assert {_reply, :ok, _state} = Engine.retweet(uid, tweet_id) # TODO fix this
+  test "Mentions", state do
+    [a, b | _tl] = state[:clients]
+    tweet = %{uid: "2", msg: "Hello Tester @1"}
+    Client.request_make_tweet(b, tweet)
+    [atomic: [{Tweets, _tweet_id, _uid, msg}]] = Client.request_query_mentions(a)
+    # Do this because tweet_id might change based on order of tests
+    assert msg == "Hello Tester @1"
   end
-
-  test "query: Subscribed-to" do
-    assert {_reply, :ok, _state} = Engine.query_timeline("myusername1")
-  end
-
-  test "query: Hashtag" do
-    assert {_reply, :ok, _state} = Engine.query_hashtag("#ThaBadApple")
-  end
-
-  test "query: Mention" do
-    assert {_reply, :ok, _state} = Engine.query_mentions("@myusername1")
-  end
-
-  test "Deliver twwets live if the user is connected" do
-    # assert {_reply, :ok, _state} =
-    assert false
-  end
-
-
-
 end

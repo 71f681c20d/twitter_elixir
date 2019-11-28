@@ -14,7 +14,7 @@ defmodule Twitter.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {Twitter, []},
+      #mod: {Twitter, []},
       extra_applications: [:logger]
     ]
   end
