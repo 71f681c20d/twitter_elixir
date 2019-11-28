@@ -5,6 +5,7 @@ defmodule Twitter do
     [num_clients_str, num_messages_str] = System.argv()
     {num_clients, ""} = Integer.parse(num_clients_str)
     {num_messages, ""} = Integer.parse(num_messages_str)
+    Wrapper.init()
     MyDynamicSupervisor.start_link()
     MyDynamicSupervisor.start_engine()
     clients = MyDynamicSupervisor.start_clients(num_clients)# Returns list of users: user = %{uid, pid}
@@ -18,6 +19,7 @@ defmodule Twitter do
     #IO.inspect(Client.request_query_timeline(b))
     #IO.inspect(Client.request_query_hashtag(a, "#Hashtag1"))
 
+    IO.puts 'done'
     :ok
   end
 

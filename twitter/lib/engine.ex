@@ -6,11 +6,12 @@ defmodule Engine do
   end
 
   def init(state) do
-    Wrapper.init()
     {:ok, state}
   end
 
-  def join_twitter(user) do GenServer.call(Engine, {:join_twitter, user}) end
+  def join_twitter(user) do
+    GenServer.call(Engine, {:join_twitter, user})
+  end
 
   def delete_twitter(user) do GenServer.call(Engine, {:delete_twitter, user}) end
 
